@@ -4,10 +4,23 @@ const cors = require('cors'); // ✅ Import CORS
 const app = express();
 
 // ✅ Allow CORS for your frontend origin
+const allowedOrigins = [
+  'http://localhost:3000',                 // local dev
+  'https://cloudbox-frontend.vercel.app'   // deployed frontend URL (update this if yours differs)
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000', // your frontend URL
-  credentials: true               // if you use cookies or auth headers
+  origin: function (origin, callback) {
+    // Allow requests with no origin (e.g. mobile apps, curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
+
 
 app.use(express.json()); // to parse JSON bodies
 
